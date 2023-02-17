@@ -1,0 +1,98 @@
+<?xml version="1.0"?>
+<odoo>
+
+        <record id="activity_automation_config_tree_view" model="ir.ui.view">
+            <field name="name">activity.automation.config.tree.view</field>
+            <field name="model">activity.automation.config</field>
+            <field name="priority" eval="1"/>
+            <field name="arch" type="xml">
+                <tree string="Automatización de actividades" sample="1" >
+                    <field name="model_id" optional="show"/>
+                    <field name="active"/>                
+                </tree>
+            </field>
+        </record>
+
+       <record id="activity_automation_config_lines_form_view" model="ir.ui.view">
+            <field name="name">activity.automation.config.form.lines.view</field>
+            <field name="model">activity.automation.config.lines</field>
+            <field name="priority" eval="1"/>
+            <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="model_id"  />
+                            <field name="model_name" />
+                            <field name="activity_type_ids" widget="many2many_tags" />
+                            <field name="action_type" />
+                            <field name="activity_description" attrs="{'invisible':[('action_type','=','delete')]}"/>						
+                        </group>
+                        <group>
+                            <field name = "active"/>
+                            <field name="user_assigment_type" attrs="{'invisible':[('action_type','=','delete')]}" />
+                            <field name="users_ids" widget="many2many_tags" attrs="{'invisible':['|',('action_type','=','delete'),('user_assigment_type','!=','specific_users')]}"/>
+                            <field name="groups_ids" widget="many2many_tags" attrs="{'invisible':['|',('action_type','=','delete'),('user_assigment_type','!=','specifics_groups')]}" />
+                            <field name="model_user_fields_ids" widget="many2many_tags" domain="[('model_id','=',model_id),('relation','=','res.users')]" attrs="{'invisible':['|',('action_type','=','delete'),('user_assigment_type','!=','model_user_fields')]}"/>
+                        </group>
+                    </group>
+                    <field name="domain_to_check" widget="domain" options="{'model': 'model_name', 'in_dialog': true}"/>
+                </sheet>
+            </form>
+
+            </field>
+        </record>
+					
+
+        <record id="activity_automation_config_form_view" model="ir.ui.view">
+            <field name="name">activity.automation.config.form.view</field>
+            <field name="model">activity.automation.config</field>
+            <field name="priority" eval="1"/>
+            <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="susbscribe_model"  invisible = "1" string="Subscribe" type="object" />
+                    <button name="unsusbscribe_model" invisible = "1"  string="Unsuscribe" type="object"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name = "model_id" options="{'no_create':True,'no_create_and_edit':True,'no_open':True,'no_quick_create':True}"/>
+                        </group>
+                        <group>
+                            <field name = "active"/>
+                        </group>
+                    </group>
+                    <field name="line_ids" mode="tree,form" attrs="{'invisible': [ ('model_id', '=', False)]}">
+                        <tree  create = '1' delete = '1'>
+                            <field name="activity_type_ids" widget="many2many_tags" />
+                            <field name="action_type"/>
+                            <field name="activity_description" attrs="{'invisible':[('action_type','=','delete')]}"/>						
+                            <field name="user_assigment_type" attrs="{'invisible':[('action_type','=','delete')]}" />
+                            <field name="users_ids" widget="many2many_tags" attrs="{'invisible':[('user_assigment_type','!=','specific_users')]}"/>
+                            <field name="groups_ids" widget="many2many_tags" attrs="{'invisible':[('user_assigment_type','!=','specifics_groups')]}" />
+                            <field name="model_user_fields_ids" widget="many2many_tags"  attrs="{'invisible':[('user_assigment_type','!=','model_user_fields')]}"/>						
+                            <field name="domain_to_check"/>
+                            <field name="active"/>
+                        </tree>
+                    </field>
+                </sheet>
+            </form>
+
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="activity_automation_action">
+            <field name="name">Activity Automation Configuration</field>
+            <field name="res_model">activity.automation.config</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <menuitem
+            id="menu_activity_automation"
+            name="Activity Automation Configuration"
+            parent = "resource.menu_resource_config"
+            action = "activity_automation.activity_automation_action"/>
+
+
+
+</odoo>
