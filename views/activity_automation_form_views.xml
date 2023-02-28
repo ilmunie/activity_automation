@@ -1,5 +1,19 @@
 <?xml version="1.0"?>
 <odoo>
+<!--
+        <record id="action_lead_mass_activity" model="ir.actions.act_window">
+            <field name="name">Planificar actividad</field>
+            <field name="res_model">mail.activity</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+            <field name="context" eval="{
+                'default_schedule_mode': 'mass_schedule',
+                'default_res_model_id': 'crm.lead',
+                }"/>
+            <field name="binding_model_id" ref="model_crm_lead"/>
+            <field name="binding_view_types">list</field>
+        </record>
+-->
 
         <record id="activity_automation_config_tree_view" model="ir.ui.view">
             <field name="name">activity.automation.config.tree.view</field>
