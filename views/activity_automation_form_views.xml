@@ -1,20 +1,5 @@
 <?xml version="1.0"?>
 <odoo>
-<!--
-        <record id="action_lead_mass_activity" model="ir.actions.act_window">
-            <field name="name">Planificar actividad</field>
-            <field name="res_model">mail.activity</field>
-            <field name="view_mode">form</field>
-            <field name="target">new</field>
-            <field name="context" eval="{
-                'default_schedule_mode': 'mass_schedule',
-                'default_res_model_id': 'crm.lead',
-                }"/>
-            <field name="binding_model_id" ref="model_crm_lead"/>
-            <field name="binding_view_types">list</field>
-        </record>
--->
-
         <record id="activity_automation_config_tree_view" model="ir.ui.view">
             <field name="name">activity.automation.config.tree.view</field>
             <field name="model">activity.automation.config</field>
@@ -64,17 +49,15 @@
             <field name="priority" eval="1"/>
             <field name="arch" type="xml">
             <form>
-                <header>
-                    <button name="susbscribe_model"  invisible = "1" string="Subscribe" type="object" />
-                    <button name="unsusbscribe_model" invisible = "1"  string="Unsuscribe" type="object"/>
-                </header>
                 <sheet>
                     <group>
                         <group>
                             <field name = "model_id" options="{'no_create':True,'no_create_and_edit':True,'no_open':True,'no_quick_create':True}"/>
+                            <field name = "domain_filter" widget="domain" options="{'model': 'model_name', 'in_dialog': true}"/>
                         </group>
                         <group>
                             <field name = "active"/>
+                            <field name = "model_name" invisible="True"/>
                         </group>
                     </group>
                     <field name="line_ids" mode="tree,form" attrs="{'invisible': [ ('model_id', '=', False)]}">
@@ -85,8 +68,9 @@
                             <field name="user_assigment_type" attrs="{'invisible':[('action_type','=','delete')]}" />
                             <field name="users_ids" widget="many2many_tags" attrs="{'invisible':[('user_assigment_type','!=','specific_users')]}"/>
                             <field name="groups_ids" widget="many2many_tags" attrs="{'invisible':[('user_assigment_type','!=','specifics_groups')]}" />
-                            <field name="model_user_fields_ids" widget="many2many_tags"  attrs="{'invisible':[('user_assigment_type','!=','model_user_fields')]}"/>						
-                            <field name="domain_to_check"/>
+                            <field name="model_user_fields_ids" widget="many2many_tags"  attrs="{'invisible':[('user_assigment_type','!=','model_user_fields')]}"/>
+                            <field name="domain_to_check" widget="domain" options="{'model': 'model_name', 'in_dialog': true}"/>
+                            <field name="model_name" invisible="1"/>
                             <field name="active"/>
                         </tree>
                     </field>
@@ -106,7 +90,4 @@
             name="Activity Automation Configuration"
             parent = "resource.menu_resource_config"
             action = "activity_automation.activity_automation_action"/>
-
-
-
 </odoo>

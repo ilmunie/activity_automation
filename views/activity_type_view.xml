@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<odoo>
+    <record id="mail_activity_type_view_form_inherited" model="ir.ui.view">
+        <field name="name">mail.mail_activity_type_view_form</field>
+        <field name="model">mail.activity.type</field>
+        <field name="inherit_id" ref="mail.mail_activity_type_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='category']" position="after">
+                 <field name="unique_in_document" />
+                 <field name="unique_per_user"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

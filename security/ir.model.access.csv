@@ -1,4 +1,5 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 
-access_activity_automation_config_lines,custom_leads.activity.automation.config.lines,model_activity_automation_config_lines,base.group_user,1,1,1,1
-access_activity_automation_config,custom_leads.activity.automation.config,model_activity_automation_config,base.group_user,1,1,1,1
+access_activity_automation_config_lines,activity_automation.activity.automation.config.lines,model_activity_automation_config_lines,base.group_user,1,1,1,1
+access_activity_automation_config,activity_automation.activity.automation.config,model_activity_automation_config,base.group_user,1,1,1,1
+access_activity_aux_variable,activity_automation.aux_variable,model_aux_variable,base.group_user,1,1,1,1
