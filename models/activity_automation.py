@@ -12,8 +12,8 @@ class ActivityAutomationConfig(models.Model):
             res.append((rec.id, name))
         return res
 
-    active = fields.Boolean()
-    model_id = fields.Many2one('ir.model', domain=[('model', 'in', ('crm.lead','sale.order','account.move','purchase.order','stock.picking'))])
+    active = fields.active = fields.Boolean(default=True)
+    model_id = fields.Many2one('ir.model', domain=[('model', 'in', ('res.partner','crm.lead','sale.order','account.move','purchase.order','stock.picking','product.product','product.template'))])
     domain_filter = fields.Char()
     model_name = fields.Char(related='model_id.model')
     line_ids = fields.One2many('activity.automation.config.lines','config_id')
@@ -41,13 +41,19 @@ class ActivityAutomationConfigLines(models.Model):
     groups_ids = fields.Many2many('res.groups', 'act_autom_config_line_group_rel', 'act_auto_conf_line_id', 'group_id')
     model_user_fields_ids = fields.Many2many('ir.model.fields', 'act_autom_config_line_field_rel', 'act_auto_conf_line_id', 'field_id')
     domain_to_check = fields.Char()
-    active = fields.Boolean()
+    active = fields.Boolean(default=True)
 
 class ActivityAutomationMixin(models.AbstractModel):
     _name = 'activity.automation.mixing'
 
     trigger_activity_schedule = fields.Boolean()
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        res = super().create(vals_list)
+        for record in res:
+            record.write({'trigger_activity_schedule': False})
+        return res
     def write(self, vals):
         res = super().write(vals)
         activity_configs_to_check = self.env['activity.automation.config'].search([('model_id','=',self._name)])
@@ -67,21 +73,26 @@ class ActivityAutomationMixin(models.AbstractModel):
                 users = []
                 if activity_rule.user_assigment_type == 'specific_users':
                     users.extend(activity_rule.users_ids.mapped('id'))
-                elif activity_rule.user_assigment_type == 'specific_groups':
+                elif activity_rule.user_assigment_type == 'specifics_groups':
                     for group in activity_rule.groups_ids:
-                        users.extend(group.user_ids.mapped('id'))
+                        users.extend(group.users.mapped('id'))
                 else:
                     for field in activity_rule.model_user_fields_ids:
                         user_field = safe_eval("self."+field.name)
                         if user_field:
                             users.append(user_field.id)
                 if users:
+                    scheduled_users = []
                     for user in users:
-                        act_id = self.activity_type_get_xml_id(act_type)
-                        self.activity_schedule(act_id, user_id=user,note=activity_rule.activity_description, date_deadline=fields.Date.today())
+                        if user not in scheduled_users:
+                            act_id = self.activity_type_get_xml_id(act_type)
+                            self.activity_schedule(act_id, user_id=user,note=activity_rule.activity_description, date_deadline=fields.Date.today())
             else:
                 for activity in self.activity_ids.filtered(lambda x: x.activity_type_id.id in activity_rule.activity_type_ids.mapped('id')):
-                    activity.sudo().unlink()
+                    if activity_rule.action_type == 'done' and self.env.user.id == activity.user_id.id:
+                        activity.action_done()
+                    else:
+                        activity.sudo().unlink()
         return False
 
     def activity_type_get_xml_id(self,activity_type_id):
@@ -114,3 +125,12 @@ class PurchaseOrder(models.Model,ActivityAutomationMixin):
 
 class StockPicking(models.Model,ActivityAutomationMixin):
     _inherit = 'stock.picking'
+
+class ResPartner(models.Model,ActivityAutomationMixin):
+    _inherit = 'res.partner'
+
+class ProductProduct(models.Model,ActivityAutomationMixin):
+    _inherit = 'product.product'
+
+class ProductTemplate(models.Model,ActivityAutomationMixin):
+    _inherit = 'product.template'
