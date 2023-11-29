@@ -29,12 +29,14 @@ class ActivityAutomationConfig(models.Model):
                     rec.write({'trigger_activity_schedule': not rec.trigger_activity_schedule})
 class ActivityAutomationConfigLines(models.Model):
     _name = 'activity.automation.config.lines'
+    _order = 'sequence'
 
+    sequence = fields.Integer()
     model_id = fields.Many2one(related='config_id.model_id', store=True)
     model_name = fields.Char(related='model_id.model', store=True)
     config_id = fields.Many2one('activity.automation.config')
     activity_type_ids = fields.Many2many('mail.activity.type', 'act_autom_config_line_act_type_rel', 'act_auto_conf_line_id', 'act_type_id')
-    action_type = fields.Selection(selection=[('create', 'Create'), ('delete', 'Delete')])
+    action_type = fields.Selection(selection=[('create', 'Create'), ('delete', 'Delete'), ('delete', 'Delete'), ('done', 'Mark as done')])
     activity_description = fields.Char()
     user_assigment_type = fields.Selection(selection=[('specific_users','Specific Users'), ('specifics_groups', 'Specific Groups'),('model_user_fields', 'Model user fields')])
     users_ids = fields.Many2many('res.users','act_autom_config_line_user_rel','act_auto_conf_line_id', 'user_id')

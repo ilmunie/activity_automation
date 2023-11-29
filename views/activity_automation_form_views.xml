@@ -62,6 +62,7 @@
                     </group>
                     <field name="line_ids" mode="tree,form" attrs="{'invisible': [ ('model_id', '=', False)]}">
                         <tree  create = '1' delete = '1'>
+                            <field name="sequence" widget="handle" />
                             <field name="activity_type_ids" widget="many2many_tags" />
                             <field name="action_type"/>
                             <field name="activity_description" attrs="{'invisible':[('action_type','=','delete')]}"/>						
