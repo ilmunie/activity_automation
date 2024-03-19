@@ -13,7 +13,7 @@ class ActivityAutomationConfig(models.Model):
         return res
 
     active = fields.active = fields.Boolean(default=True)
-    model_id = fields.Many2one('ir.model', domain=[('model', 'in', ('res.partner','crm.lead','sale.order','account.move','purchase.order','stock.picking','product.product','product.template'))])
+    model_id = fields.Many2one('ir.model', domain=[('model', 'in', ('mrp.production', 'res.partner','crm.lead','sale.order','account.move','purchase.order','stock.picking','product.product','product.template'))])
     domain_filter = fields.Char()
     model_name = fields.Char(related='model_id.model')
     line_ids = fields.One2many('activity.automation.config.lines','config_id')
@@ -136,3 +136,6 @@ class ProductProduct(models.Model,ActivityAutomationMixin):
 
 class ProductTemplate(models.Model,ActivityAutomationMixin):
     _inherit = 'product.template'
+
+class MrpProduction(models.Model,ActivityAutomationMixin):
+    _inherit = 'mrp.production'

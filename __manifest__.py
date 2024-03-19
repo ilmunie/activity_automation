@@ -13,6 +13,7 @@
         'purchase',
         'stock',
         'account',
+        'mrp',
     ],
     'data': [
         'views/activity_automation_form_views.xml',
