@@ -88,7 +88,7 @@ class ActivityAutomationMixin(models.AbstractModel):
                     for user in users:
                         if user not in scheduled_users:
                             act_id = self.activity_type_get_xml_id(act_type)
-                            self.activity_schedule(act_id, user_id=user,note=activity_rule.activity_description, date_deadline=fields.Date.today())
+                            self.activity_schedule(act_id, user_id=user,note=activity_rule.activity_description or '', date_deadline=fields.Date.today())
             else:
                 for activity in self.activity_ids.filtered(lambda x: x.activity_type_id.id in activity_rule.activity_type_ids.mapped('id')):
                     if activity_rule.action_type == 'done' and self.env.user.id == activity.user_id.id:
