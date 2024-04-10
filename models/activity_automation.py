@@ -58,15 +58,16 @@ class ActivityAutomationMixin(models.AbstractModel):
         return res
     def write(self, vals):
         res = super().write(vals)
-        activity_configs_to_check = self.env['activity.automation.config'].search([('model_id','=',self._name)])
-        if activity_configs_to_check:
-            for activity_config_to_check in activity_configs_to_check:
-                for activity_rule in activity_config_to_check.line_ids.filtered(lambda x:x.active):
-                    conditions = safe_eval(activity_rule.domain_to_check)
-                    conditions.append(('id','=',self.id))
-                    result = self.env[self._name].search_count(conditions)
-                    if result and result > 0:
-                        self.exec_activity_automation_line(activity_rule)
+        for record in self:
+            activity_configs_to_check = self.env['activity.automation.config'].search([('model_id','=',record._name)])
+            if activity_configs_to_check:
+                for activity_config_to_check in activity_configs_to_check:
+                    for activity_rule in activity_config_to_check.line_ids.filtered(lambda x:x.active):
+                        conditions = safe_eval(activity_rule.domain_to_check)
+                        conditions.append(('id','=',record.id))
+                        result = self.env[record._name].search_count(conditions)
+                        if result and result > 0:
+                            record.exec_activity_automation_line(activity_rule)
         return res
 
     def exec_activity_automation_line(self,activity_rule):
