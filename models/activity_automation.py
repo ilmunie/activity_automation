@@ -1,6 +1,6 @@
 from odoo import api,models,fields,_,SUPERUSER_ID
 from odoo.tools.safe_eval import safe_eval
-
+import datetime
 class ActivityAutomationConfig(models.Model):
     _name = 'activity.automation.config'
 
@@ -44,6 +44,7 @@ class ActivityAutomationConfigLines(models.Model):
     model_user_fields_ids = fields.Many2many('ir.model.fields', 'act_autom_config_line_field_rel', 'act_auto_conf_line_id', 'field_id')
     domain_to_check = fields.Char()
     active = fields.Boolean(default=True)
+    additional_python_condition_function = fields.Text(help="7 <= (datetime.datetime.now() - record.datetime_in_stage).days")
 
 class ActivityAutomationMixin(models.AbstractModel):
     _name = 'activity.automation.mixing'
@@ -67,7 +68,10 @@ class ActivityAutomationMixin(models.AbstractModel):
                         conditions.append(('id','=',record.id))
                         result = self.env[record._name].search_count(conditions)
                         if result and result > 0:
-                            record.exec_activity_automation_line(activity_rule)
+                            if not activity_rule.additional_python_condition_function:
+                                record.exec_activity_automation_line(activity_rule)
+                            elif eval(activity_rule.additional_python_condition_function):
+                                record.exec_activity_automation_line(activity_rule)
         return res
 
     def exec_activity_automation_line(self,activity_rule):
