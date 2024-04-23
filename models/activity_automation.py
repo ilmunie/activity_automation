@@ -74,7 +74,7 @@ class ActivityAutomationMixin(models.AbstractModel):
                                 record.exec_activity_automation_line(activity_rule)
         return res
 
-    def exec_activity_automation_line(self,activity_rule):
+    def exec_activity_automation_line(self, activity_rule):
         for act_type in activity_rule.activity_type_ids:
             if activity_rule.action_type == 'create':
                 users = []
@@ -85,21 +85,21 @@ class ActivityAutomationMixin(models.AbstractModel):
                         users.extend(group.users.mapped('id'))
                 else:
                     for field in activity_rule.model_user_fields_ids:
-                        user_field = safe_eval("self."+field.name)
+                        user_field = self[field.name]
                         if user_field:
                             users.append(user_field.id)
+                        else:
+                            users.append(self.env.user.id)
                 if users:
                     scheduled_users = []
                     for user in users:
                         if user not in scheduled_users:
                             act_id = self.activity_type_get_xml_id(act_type)
-                            self.activity_schedule(act_id, user_id=user,note=activity_rule.activity_description or '', date_deadline=fields.Date.today())
+                            self.activity_schedule(act_id, user_id=user,note=activity_rule.activity_description, date_deadline=fields.Date.today())
+                            scheduled_users.append(user)
             else:
                 for activity in self.activity_ids.filtered(lambda x: x.activity_type_id.id in activity_rule.activity_type_ids.mapped('id')):
-                    if activity_rule.action_type == 'done' and self.env.user.id == activity.user_id.id:
-                        activity.action_done()
-                    else:
-                        activity.sudo().unlink()
+                    activity.sudo().unlink()
         return False
 
     def activity_type_get_xml_id(self,activity_type_id):
